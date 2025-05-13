@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "nombre": "Papas fritas",
+        "precio": 10.0,
+        "cantidad": 30,
+        "codigo_producto": "PF0101"
+    },
+    {
+        "id": 2,
+        "nombre": "Nuggets de pollo",
+        "precio": 10.0,
+        "cantidad": 20,
+        "codigo_producto": "NP0101"
+    },
+    {
+        "id": 3,
+        "nombre": "Papitas lays de queso",
+        "precio": 3.0,
+        "cantidad": 100,
+        "codigo_producto": "PL0101"
+    }
+]
