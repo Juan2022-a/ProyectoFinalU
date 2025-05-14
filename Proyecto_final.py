@@ -32,7 +32,7 @@ def Crear_producto(nombre, precio, cantidad, codigo_producto):
     print("👌 Nuevo registro agregado. 👌") 
     
 # Def para editar los productos por id y codigo de producto
-def Editar_producto(id_producto=None, codigo_producto=None, nombre=None, precio=None, cantidad=None):
+def Editar_producto(id_producto=None, codigo_producto=None, nombre=None, precio=None, cantidad=None, nuevo_codigo=None):
     registros = Cargar_registros()
     for producto in registros:
         # Verifica si coincide el ID o el código del producto
@@ -45,8 +45,8 @@ def Editar_producto(id_producto=None, codigo_producto=None, nombre=None, precio=
                 producto["precio"] = precio
             if cantidad is not None:
                 producto["cantidad"] = cantidad
-            if codigo_producto is not None:
-                producto["codigo_producto"] = codigo_producto
+            if nuevo_codigo is not None:
+                producto["codigo_producto"] = nuevo_codigo
             Guardar_registros(registros)
             print("👌 Registro editado correctamente. 👌")
             return
@@ -92,7 +92,7 @@ def Mostrar_tabla(lista):
         print("⚠️ No existen registros para mostrar. ⚠️")
         return
     datos_tabla = []
-    encabezados = ["ID", "Nombre", "Precio", "Cantidad", "Codigo_producto"]
+    encabezados = ["ID", "Nombre", "Precio", "Cantidad", "Codigo producto"]
     for producto in lista:
         datos_tabla.append([
             producto["id"],
@@ -138,14 +138,17 @@ def menu():
 
         opcion = input("Selecciona una opción: ")
         
-        # Primera opción para crear un producto
+# Primera opción para crear un producto --------------------------------------------------------------------------------------
         if opcion == "1":
+            cancelado = False  # Bandera para controlar si se cancela la operación y regresar al menú
+
             # Validación para el nombre
             while True:
                 nombre = input("Nombre del producto (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
                 if nombre.lower() == "cancelar" or nombre == "0":
                     print("🚫 Operación cancelada. Regresando al menú...")
-                    continue  # Regresa al menú
+                    cancelado = True  # Se activa la bandera de cancelación y regresa al menú
+                    break
                 if len(nombre) < 3 or len(nombre) > 50:
                     print("⚠️ El nombre debe tener entre 3 y 50 caracteres.")
                 elif not nombre.replace(" ", "").isalpha():
@@ -154,14 +157,18 @@ def menu():
                     print("⚠️ Ya existe un producto con este nombre.")
                 else:
                     break
-            
+
+            if cancelado:
+                continue  # Regresa al menú principal
+
             # Validación para el precio
             while True:
                 try:
                     precio = input("Precio del producto (o escribe 'cancelar' o '0' para regresar al menú): ")
                     if precio.lower() == "cancelar" or precio == "0":
                         print("🚫 Operación cancelada. Regresando al menú...")
-                        continue  # Regresa al menú
+                        cancelado = True  # Se activa la bandera de cancelación y regresa al menú
+                        break
                     precio = float(precio)
                     if precio <= 0 or precio > 1000.00:
                         print("⚠️ El precio debe ser mayor a 0 y no exceder $1000.")
@@ -171,14 +178,18 @@ def menu():
                         break
                 except ValueError:
                     print("⚠️ Debes ingresar un número válido para el precio.")
-            
+
+            if cancelado:
+                continue  # Regresa al menú principal
+
             # Validación para la cantidad
             while True:
                 try:
                     cantidad = input("Cantidad del producto (o escribe 'cancelar' o '0' para regresar al menú): ")
                     if cantidad.lower() == "cancelar" or cantidad == "0":
                         print("🚫 Operación cancelada. Regresando al menú...")
-                        continue  # Regresa al menú
+                        cancelado = True  # Se activa la bandera de cancelación y regresa al menú
+                        break
                     cantidad = int(cantidad)
                     if cantidad < 0 or cantidad > 1000:
                         print("⚠️ La cantidad debe ser un número entero entre 0 y 1000.")
@@ -186,13 +197,17 @@ def menu():
                         break
                 except ValueError:
                     print("⚠️ Debes ingresar un número entero válido para la cantidad.")
-            
+
+            if cancelado:
+                continue  # Regresa al menú principal
+
             # Validación para el código
             while True:
                 codigo_producto = input("Código del producto (o escribe 'cancelar' o '0' para regresar al menú): ").strip().upper()
                 if codigo_producto.lower() == "cancelar" or codigo_producto == "0":
                     print("🚫 Operación cancelada. Regresando al menú...")
-                    continue  # Regresa al menú
+                    cancelado = True  # Se activa la bandera de cancelación y regresa al menú
+                    break
                 if len(codigo_producto) < 4 or len(codigo_producto) > 20:
                     print("⚠️ El código debe tener entre 4 y 20 caracteres.")
                 elif not codigo_producto.replace("-", "").isalnum():
@@ -201,15 +216,21 @@ def menu():
                     print("⚠️ Ya existe un producto con este código.")
                 else:
                     break
-            
+
+            if cancelado:
+                continue  # Regresa al menú principal
+
+            # Se crea el producto si no es cancelado
             Crear_producto(nombre, precio, cantidad, codigo_producto)
         
-        # Segunda opción para editar un producto
+# Segunda opción para editar un producto -----------------------------------------------------------------------------------------
         elif opcion == "2":
+            cancelado = False  # Bandera para controlar si se cancela la operación y regresar al menú
+            
             identificador = input("Escriba el ID o el código del producto que desea editar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
             if identificador.lower() == "cancelar" or identificador == "0":
                 print("🚫 Operación cancelada. Regresando al menú...")
-                continue  # Regresa al menú
+                continue  # Regresa al menú principal
             
             # Determinar si es un ID o un código
             id_producto = None
@@ -232,7 +253,8 @@ def menu():
                 nombre = input("Nuevo nombre del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ").strip()
                 if nombre.lower() == "cancelar" or nombre == "0":
                     print("🚫 Operación cancelada. Regresando al menú...")
-                    continue  # Regresa al menú
+                    cancelado = True
+                    break
                 if not nombre:
                     nombre = None
                     break
@@ -245,13 +267,17 @@ def menu():
                 else:
                     break
             
+            if cancelado:
+                continue  # Regresa al menú principal
+            
             # Validación para el nuevo precio
             while True:
                 try:
                     precio = input("Nuevo precio del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ")
                     if precio.lower() == "cancelar" or precio == "0":
                         print("🚫 Operación cancelada. Regresando al menú...")
-                        continue  # Regresa al menú
+                        cancelado = True
+                        break
                     if not precio:
                         precio = None
                         break
@@ -265,13 +291,17 @@ def menu():
                 except ValueError:
                     print("⚠️ Debes ingresar un número válido para el precio.")
             
+            if cancelado:
+                continue  # Regresa al menú principal
+            
             # Validación para la nueva cantidad
             while True:
                 try:
                     cantidad = input("Nueva cantidad del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ")
                     if cantidad.lower() == "cancelar" or cantidad == "0":
                         print("🚫 Operación cancelada. Regresando al menú...")
-                        continue  # Regresa al menú
+                        cancelado = True
+                        break
                     if not cantidad:
                         cantidad = None
                         break
@@ -283,12 +313,16 @@ def menu():
                 except ValueError:
                     print("⚠️ Debes ingresar un número entero válido para la cantidad.")
             
+            if cancelado:
+                continue  # Regresa al menú principal
+            
             # Validación para el nuevo código
             while True:
                 nuevo_codigo = input("Nuevo código del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ").strip().upper()
                 if nuevo_codigo.lower() == "cancelar" or nuevo_codigo == "0":
                     print("🚫 Operación cancelada. Regresando al menú...")
-                    continue  # Regresa al menú
+                    cancelado = True
+                    break
                 if not nuevo_codigo:
                     nuevo_codigo = None
                     break
@@ -301,15 +335,18 @@ def menu():
                 else:
                     break
             
-            # Editar el producto
-            Editar_producto(id_producto, codigo_producto, nombre, precio, cantidad)
-        
-        # Tercera opción para eliminar un producto
+            if cancelado:
+                continue  # Regresa al menú principal
+            
+            # Editar el producto si no se cancela nada
+            Editar_producto(id_producto, codigo_producto, nombre, precio, cantidad, nuevo_codigo)
+
+# Tercera opción para eliminar un producto -----------------------------------------------------------------------------------------
         elif opcion == "3":
             identificador = input("Escriba el ID o el código del producto que desea eliminar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
             if identificador.lower() == "cancelar" or identificador == "0":
                 print("🚫 Operación cancelada. Regresando al menú...")
-                return
+                continue  # Regresa al menú principal
             
             id_producto = None
             codigo_producto = None
@@ -320,16 +357,41 @@ def menu():
             
             Eliminar_producto(id_producto, codigo_producto)
         
-        # Cuarta opción para buscar un producto --------------------------------------------------------------------------------------------            
+# Cuarta opción para buscar un producto --------------------------------------------------------------------------------------------
         elif opcion == "4":
-            id_producto = int(input("ID del producto a buscar (dejar en blanco si no se desea buscar): ") or 0)
-            codigo_producto = input("Código del producto a buscar (dejar en blanco si no se desea buscar): ") or None
-            Buscar_producto_id_codigo(id_producto, codigo_producto)
+            identificador = input("Escribe el ID o el código del producto que deseas buscar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
+            if identificador.lower() == "cancelar" or identificador == "0":
+                print("🚫 Operación cancelada. Regresando al menú...")
+                continue  # Regresa al menú principal
+
+            # Determinar si es un ID o un código
+            id_producto = None
+            codigo_producto = None
+            if identificador.isdigit():  # Si es un número, se trata como ID
+                id_producto = int(identificador)
+            else:  # Si no es un número, se trata como código
+                codigo_producto = identificador.upper()
+
+            # Buscar el producto
+            producto = Buscar_producto_id_codigo(id_producto, codigo_producto)
+            if producto:
+                Mostrar_tabla([producto])  # Mostrar el producto en una tabla
+            else:
+                print("⚠️ Producto no encontrado. ⚠️")
 
 # Quinta opción para buscar un producto por nombre ---------------------------------------------------------------------------------            
         elif opcion == "5":
-            nombre = input("Nombre del producto a buscar: ")
-            Buscar_producto_por_nombre(nombre)
+            nombre = input("Nombre del producto a buscar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
+            if nombre.lower() == "cancelar" or nombre == "0":
+                print("🚫 Operación cancelada. Regresando al menú...")
+                continue  # Regresa al menú principal
+        
+            # Buscar productos por nombre
+            productos_encontrados = Buscar_producto_por_nombre(nombre)
+            if productos_encontrados:
+                Mostrar_tabla(productos_encontrados)  # Mostrar los productos encontrados en una tabla
+            else:
+                print("⚠️ No se encontró ningún producto con ese nombre. ⚠️")
 
 # Sexta opción para mostrar todos los productos -----------------------------------------------------------------------------------            
         elif opcion == "6":
