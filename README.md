@@ -1,5 +1,9 @@
-# ProyectoFinalU Inventario de productos
+# Proyecto final desarrollo de la logica de programación 
 
-Juan Pablo Flamenco Pineda 
-Ricardo Antonio Rodríguez Olivares 
-Antony Bryan Rosales Hernandez 
+# Tema: Inventario de productos
+
+- Juan Pablo Flamenco Pineda 
+
+- Ricardo Antonio Rodríguez Olivares 
+
+- Antony Bryan Rosales Hernandez 
