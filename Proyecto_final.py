@@ -72,7 +72,6 @@ def Buscar_producto_id_codigo(id_producto=None, codigo_producto=None):
            (codigo_producto is not None and producto["codigo_producto"] == codigo_producto):
             print("👌 Producto encontrado. 👌")
             return producto
-    print("⚠️ Producto no encontrado. ⚠️")
     return None    
 
 # Def para buscar productos por nombre
@@ -220,40 +219,38 @@ def menu():
             if cancelado:
                 continue  # Regresa al menú principal
 
-            # Se crea el producto si no es cancelado
             Crear_producto(nombre, precio, cantidad, codigo_producto)
         
 # Segunda opción para editar un producto -----------------------------------------------------------------------------------------
         elif opcion == "2":
             cancelado = False  # Bandera para controlar si se cancela la operación y regresar al menú
-            
+
             while True:  # Bucle para volver a preguntar si el producto no se encuentra
                 identificador = input("Escriba el ID o el código del producto que desea editar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
                 if identificador.lower() == "cancelar" or identificador == "0":
                     print("🚫 Operación cancelada. Regresando al menú...")
                     cancelado = True
                     break  # Salir del bucle y regresar al menú principal
-                
-                # Determinar si es un ID o un código
-                id_producto = None
-                codigo_producto = None
+
+                producto = None
+                # Si es dígito, primero busca por ID, si no lo encuentra, busca por código
                 if identificador.isdigit():
-                    id_producto = int(identificador)
+                    producto = Buscar_producto_id_codigo(int(identificador), None)
+                    if not producto:
+                        producto = Buscar_producto_id_codigo(None, identificador)
                 else:
-                    codigo_producto = identificador.upper()
-                
-                # Buscar el producto
-                producto = Buscar_producto_id_codigo(id_producto, codigo_producto)
+                    producto = Buscar_producto_id_codigo(None, identificador.upper())
+
                 if producto:
                     # Mostrar el producto encontrado en una tabla
                     Mostrar_tabla([producto])
                     break  # Salir del bucle si el producto se encuentra
                 else:
                     print("⚠️ Producto no encontrado. Inténtalo nuevamente. ⚠️")
-            
+
             if cancelado:
                 continue  # Regresa al menú principal
-            
+
             # Validación para el nuevo nombre
             while True:
                 nombre = input("Nuevo nombre del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ").strip()
@@ -272,10 +269,10 @@ def menu():
                     print("⚠️ Ya existe un producto con este nombre.")
                 else:
                     break
-            
+
             if cancelado:
                 continue  # Regresa al menú principal
-            
+
             # Validación para el nuevo precio
             while True:
                 try:
@@ -296,10 +293,10 @@ def menu():
                         break
                 except ValueError:
                     print("⚠️ Debes ingresar un número válido para el precio.")
-            
+
             if cancelado:
                 continue  # Regresa al menú principal
-            
+
             # Validación para la nueva cantidad
             while True:
                 try:
@@ -318,11 +315,11 @@ def menu():
                         break
                 except ValueError:
                     print("⚠️ Debes ingresar un número entero válido para la cantidad.")
-            
+
             if cancelado:
                 continue  # Regresa al menú principal
-            
-            # Validación para el nuevo código
+
+            # Validación para el nuevo código ingresado
             while True:
                 nuevo_codigo = input("Nuevo código del producto (dejar en blanco si no se desea editar, o escribe 'cancelar' o '0' para regresar al menú): ").strip().upper()
                 if nuevo_codigo.lower() == "cancelar" or nuevo_codigo == "0":
@@ -340,29 +337,39 @@ def menu():
                     print("⚠️ Ya existe un producto con este código.")
                 else:
                     break
-            
+
             if cancelado:
                 continue  # Regresa al menú principal
-            
-            # Editar el producto si no se cancela nada
-            Editar_producto(id_producto, codigo_producto, nombre, precio, cantidad, nuevo_codigo)
+
+            Editar_producto(producto["id"], producto["codigo_producto"], nombre, precio, cantidad, nuevo_codigo)
 
 # Tercera opción para eliminar un producto -----------------------------------------------------------------------------------------
         elif opcion == "3":
-            identificador = input("Escriba el ID o el código del producto que desea eliminar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
-            if identificador.lower() == "cancelar" or identificador == "0":
-                print("🚫 Operación cancelada. Regresando al menú...")
-                continue  # Regresa al menú principal
-            
-            id_producto = None
-            codigo_producto = None
-            if identificador.isdigit():
-                id_producto = int(identificador)
-            else:
-                codigo_producto = identificador.upper()
-            
-            Eliminar_producto(id_producto, codigo_producto)
-        
+            while True:
+                identificador = input("Escriba el ID o el código del producto que desea eliminar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
+                if identificador.lower() == "cancelar" or identificador == "0":
+                    print("🚫 Operación cancelada. Regresando al menú...")
+                    break  # Regresa al menú principal
+
+                producto = None
+                if identificador.isdigit():
+                    producto = Buscar_producto_id_codigo(int(identificador), None)
+                    if not producto:
+                        producto = Buscar_producto_id_codigo(None, identificador)
+                else:
+                    producto = Buscar_producto_id_codigo(None, identificador.upper())
+
+                if producto:
+                    Mostrar_tabla([producto])
+                    confirmar = input("¿Seguro quieres eliminar este producto? (s/n): ").strip().lower()
+                    if confirmar == "s":
+                        Eliminar_producto(producto["id"], producto["codigo_producto"])
+                    else:
+                        print("🚫 Operación cancelada. Regresando al menú...")
+                    break
+                else:
+                    print("⚠️ Producto no encontrado. Inténtalo nuevamente. ⚠️")
+
 # Cuarta opción para buscar un producto --------------------------------------------------------------------------------------------
         elif opcion == "4":
             identificador = input("Escribe el ID o el código del producto que deseas buscar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
@@ -370,16 +377,14 @@ def menu():
                 print("🚫 Operación cancelada. Regresando al menú...")
                 continue  # Regresa al menú principal
 
-            # Determinar si es un ID o un código
-            id_producto = None
-            codigo_producto = None
-            if identificador.isdigit():  # Si es un número, se trata como ID
-                id_producto = int(identificador)
-            else:  # Si no es un número, se trata como código
-                codigo_producto = identificador.upper()
+            producto = None
+            if identificador.isdigit():
+                producto = Buscar_producto_id_codigo(int(identificador), None)
+                if not producto:
+                    producto = Buscar_producto_id_codigo(None, identificador)
+            else:
+                producto = Buscar_producto_id_codigo(None, identificador.upper())
 
-            # Buscar el producto
-            producto = Buscar_producto_id_codigo(id_producto, codigo_producto)
             if producto:
                 Mostrar_tabla([producto])  # Mostrar el producto en una tabla
             else:
