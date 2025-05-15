@@ -227,26 +227,32 @@ def menu():
         elif opcion == "2":
             cancelado = False  # Bandera para controlar si se cancela la operación y regresar al menú
             
-            identificador = input("Escriba el ID o el código del producto que desea editar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
-            if identificador.lower() == "cancelar" or identificador == "0":
-                print("🚫 Operación cancelada. Regresando al menú...")
+            while True:  # Bucle para volver a preguntar si el producto no se encuentra
+                identificador = input("Escriba el ID o el código del producto que desea editar (o escribe 'cancelar' o '0' para regresar al menú): ").strip()
+                if identificador.lower() == "cancelar" or identificador == "0":
+                    print("🚫 Operación cancelada. Regresando al menú...")
+                    cancelado = True
+                    break  # Salir del bucle y regresar al menú principal
+                
+                # Determinar si es un ID o un código
+                id_producto = None
+                codigo_producto = None
+                if identificador.isdigit():
+                    id_producto = int(identificador)
+                else:
+                    codigo_producto = identificador.upper()
+                
+                # Buscar el producto
+                producto = Buscar_producto_id_codigo(id_producto, codigo_producto)
+                if producto:
+                    # Mostrar el producto encontrado en una tabla
+                    Mostrar_tabla([producto])
+                    break  # Salir del bucle si el producto se encuentra
+                else:
+                    print("⚠️ Producto no encontrado. Inténtalo nuevamente. ⚠️")
+            
+            if cancelado:
                 continue  # Regresa al menú principal
-            
-            # Determinar si es un ID o un código
-            id_producto = None
-            codigo_producto = None
-            if identificador.isdigit():
-                id_producto = int(identificador)
-            else:
-                codigo_producto = identificador.upper()
-            
-            # Buscar el producto
-            producto = Buscar_producto_id_codigo(id_producto, codigo_producto)
-            if not producto:
-                print("⚠️ Producto no encontrado. ⚠️")
-                continue
-            
-            print(f"Producto encontrado: {producto}")
             
             # Validación para el nuevo nombre
             while True:
